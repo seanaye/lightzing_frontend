@@ -18,9 +18,14 @@
 // import { userSession } from '../userSession'
 export default {
   name: 'signin',
+  computed: {
+    userSession () {
+      return this.$store.state.user.userSession
+    }
+  },
   methods: {
     signIn () {
-      this.$userSession.redirectToSignIn()
+      this.userSession.redirectToSignIn('http://localhost:3000/block')
     }
   }
 }

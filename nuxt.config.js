@@ -30,7 +30,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '~/plugins/userSession'
+    '~/plugins/userSession.js'
   ],
   render: {
     static: {
