@@ -1,8 +1,7 @@
 <template>
-  <div class="center">
+  <div>
     <landing v-if="! $store.state.user.signedIn"></landing>
     <dashboard v-if="person" :user="person"></dashboard>
-
   </div>
 </template>
 

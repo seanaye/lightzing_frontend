@@ -35,11 +35,13 @@ export default {
   render: {
     static: {
       setHeaders(res, path) {
-        console.log({ res: res, path: path })
-        res.setHeader('X-Frame-Options', 'ALLOWALL')
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.setHeader('Access-Control-Allow-Methods', 'GET')
-        res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+        if (path.includes('manifest.json')) {
+          res.setHeader('X-Frame-Options', 'ALLOWALL')
+          res.setHeader('Content-Type', 'application/json')
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+          res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        }
       }
     }
   },

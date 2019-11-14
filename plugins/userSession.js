@@ -1,7 +1,6 @@
 import blockstack from 'blockstack'
 
 export default (ctx, inject) => {
-  console.log('injecting')
   inject('createSession', () => {
     const appConfig = new blockstack.AppConfig(
       ['store_write', 'publish_data'],
