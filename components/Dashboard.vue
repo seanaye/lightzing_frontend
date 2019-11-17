@@ -32,13 +32,16 @@
       <v-col cols="12" sm="6" lg="5">
         <v-card>
           <v-card-actions>
-            <v-row justify="center">
+            <v-row justify="center" style="width: 100%">
               <v-col cols="12">
                 <v-text-field v-model="searchUserQuery" color="white" outlined label="Search users">
                   <template v-slot:append>
                     <v-icon @click="searchUser">mdi-magnify</v-icon>
                   </template>
                 </v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <FriendList></FriendList>
               </v-col>
             </v-row>
           </v-card-actions>
@@ -51,8 +54,12 @@
 <script>
 // import { userSession } from '../userSession'
 import { lookupProfile } from 'blockstack'
+import FriendList from '~/components/FriendList'
 
 export default {
+  components: {
+    FriendList
+  },
   data () {
     return {
       searchUserQuery: '',
@@ -72,7 +79,7 @@ export default {
         const result = await lookupProfile(this.searchUserQuery)
         console.log(result)
         if (result) {
-          this.$store.dispatch('user/ADD_FRIENDS', [this.searchUserQuery])
+          this.$store.dispatch('friends/ADD_FRIENDS', [this.searchUserQuery])
         }
       } catch (err) {
         console.log(err)
@@ -87,7 +94,7 @@ export default {
   },
   created () {
     this.$store.dispatch('user/LOAD_STATUS')
-    this.$store.dispatch('user/LOAD_FRIENDS')
+    this.$store.dispatch('friends/LOAD_FRIENDS')
   },
   computed: {
     avatar () {
@@ -100,9 +107,6 @@ export default {
     },
     currentStatus () {
       return this.$store.state.user.currentStatus
-    },
-    friends () {
-      return this.$store.state.user.friends
     }
   }
 }
