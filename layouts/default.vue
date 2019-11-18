@@ -1,5 +1,8 @@
 <template>
   <v-app dark>
+    <v-dialog v-model="expenseDialog">
+      <ExpenseCard></ExpenseCard>
+    </v-dialog>
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -87,7 +90,12 @@
 </template>
 
 <script>
+import ExpenseCard from '~/components/ExpenseCard'
+
 export default {
+  components: {
+    ExpenseCard
+  },
   data () {
     return {
       clipped: false,
@@ -114,6 +122,16 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Vuetify.js'
+    }
+  },
+  computed: {
+    expenseDialog: {
+      get () {
+        return this.$store.state.showExpenseDialog
+      },
+      set (val) {
+        this.$store.commit('M_EXPENSE_DIALOG', { show: val })
+      }
     }
   }
 }

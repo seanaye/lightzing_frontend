@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     signOut () {
-      this.$store.commit('user/LOGOUT')
+      this.$store.dispatch('user/LOGOUT')
     },
     updateStatus () {
       this.$store.dispatch('user/UPDATE_STATUS', this.newStatus)
@@ -79,7 +79,7 @@ export default {
         const result = await lookupProfile(this.searchUserQuery)
         console.log(result)
         if (result) {
-          this.$store.dispatch('friends/ADD_FRIENDS', [this.searchUserQuery])
+          this.$store.dispatch('friends/ADD_FRIENDS', { friends: [this.searchUserQuery], loadProfiles: true })
         }
       } catch (err) {
         console.log(err)

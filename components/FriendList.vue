@@ -2,7 +2,7 @@
   <v-list two-line>
     <template v-for="(friend, i) in friends">
       <v-list-item
-        @click="dummy"
+        @click="goToProfile(friend.username)"
         :key="i * 2 + 1"
       >
         <v-list-item-avatar>
@@ -31,8 +31,8 @@ export default {
     }
   },
   methods: {
-    dummy () {
-      return true
+    goToProfile (id) {
+      this.$router.push(`user/${id}`)
     }
   }
 }

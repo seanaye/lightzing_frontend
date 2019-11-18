@@ -1,4 +1,4 @@
-import { Person } from 'blockstack'
+import { Person, hexStringToECPair } from 'blockstack'
 
 export const state = () => ({
   signedIn: false,
@@ -30,14 +30,18 @@ export const mutations = {
 }
 
 export const actions = {
-  async INIT_SESSION ({ commit }) {
+  async INIT_SESSION ({ commit, state, dispatch }) {
     const session = this.$createSession()
     commit('M_SESSION', session)
     if (session.isUserSignedIn()) {
       commit('INIT_USERDATA', session.loadUserData())
     } else if (session.isSignInPending()) {
       commit('INIT_USERDATA', await session.handlePendingSignIn())
+    } else {
+      // Delete this in favor of login dialog in root state
+      state.userSession.redirectToSignIn(window.location.href)
     }
+    await dispatch('ENSURE_PUBLIC_KEY')
   },
   async UPDATE_STATUS ({ commit, state }, newStatus) {
     const status = {
@@ -53,5 +57,18 @@ export const actions = {
     const status = JSON.parse(file)
     console.log(status)
     commit('M_CURRENT_STATUS', status.status)
+  },
+  LOGOUT ({ commit }) {
+    commit('LOGOUT')
+    commit('friends/LOGOUT', '', { root: true })
+  },
+  async ENSURE_PUBLIC_KEY ({ state }) {
+    const file = await state.userSession.getFile('public_key.json', { decrypt: false })
+    console.log(file)
+    if (!file) {
+      console.log('putting public key')
+      const appPublicKey = hexStringToECPair(state.userData.appPrivateKey).publicKey.toString('hex')
+      await state.userSession.putFile('public_key.json', JSON.stringify({ appPublicKey }), { sign: true })
+    }
   }
 }

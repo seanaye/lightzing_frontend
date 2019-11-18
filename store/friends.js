@@ -11,23 +11,34 @@ export const mutations = {
   },
   M_LOADED_FRIENDS (state, loadedFriends) {
     state.loadedFriends = loadedFriends
+  },
+  LOGOUT (state) {
+    state.friends = []
+    state.loadedFriends = []
   }
 }
 
 export const actions = {
-  async ADD_FRIENDS ({ commit, rootState, dispatch, state }, friends) {
+  async ADD_FRIENDS ({ commit, rootState, state, dispatch }, { friends, loadProfiles }) {
     console.log(friends)
     const newFriends = [
       ...new Set(state.friends.concat(friends))
     ].filter(elem => elem !== rootState.user.userData.username)
-    const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends), { encrypt: false })
-    console.log(updated)
     commit('M_FRIENDS', newFriends)
-    dispatch('LOAD_PROFILES')
+    const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
+    console.log(updated)
+    if (loadProfiles) {
+      dispatch('LOAD_PROFILES')
+    }
+  },
+  async REMOVE_FRIEND ({ commit, rootState, state }, friend) {
+    const newFriends = state.friends.filter(elem => elem !== friend)
+    commit('M_FRIENDS', newFriends)
+    await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
   },
   async LOAD_FRIENDS ({ commit, rootState }) {
     console.log('load frinds')
-    const file = await rootState.user.userSession.getFile('friends.json', { decrypt: false })
+    const file = await rootState.user.userSession.getFile('friends.json')
     const friends = JSON.parse(file)
     commit('M_FRIENDS', friends)
   },
@@ -43,5 +54,14 @@ export const actions = {
       return person
     })
     commit('M_LOADED_FRIENDS', await Promise.all(loadedFriends))
+  },
+  async LOAD_PROFILE ({ commit, state }, id) {
+    const loaded = state.loadedFriends.filter(elem => elem === id)
+    if (loaded.length === 0) {
+      const userData = await lookupProfile(id)
+      const person = new Person(userData)
+      person.username = id
+      commit('M_LOADED_FRIENDS', state.loadedFriends.concat(person))
+    }
   }
 }
