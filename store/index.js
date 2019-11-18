@@ -1,7 +1,11 @@
 export const state = () => ({
   showSignInModal: false,
   showExpenseDialog: false,
-  splitWith: []
+  splitWith: [],
+  selectedPaidBy: '',
+  payAmount: 0,
+  currency: 'USD',
+  payDescription: ''
 })
 
 export const mutations = {
@@ -14,5 +18,17 @@ export const mutations = {
       }
       state.splitWith = toSplit
     }
+  },
+  M_SELECTED_PAID_BY (state, paidBy) {
+    state.selectedPaidBy = paidBy
+  },
+  M_PAY_AMOUNT (state, amount) {
+    state.payAmount = amount
+  },
+  M_CURRENCY (state, currency) {
+    state.currency = currency
+  },
+  M_PAY_DESCRIPTION (state, value) {
+    state.payDescription = value
   }
 }

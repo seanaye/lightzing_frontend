@@ -94,16 +94,13 @@ export default {
   },
   created () {
     this.$store.dispatch('user/LOAD_STATUS')
-    this.$store.dispatch('friends/LOAD_FRIENDS')
   },
   computed: {
     avatar () {
-      const a = this.$store.state.user.person.avatarUrl()
-      return a || 'https://s3.amazonaws.com/onename/avatar-placeholder.png'
+      return this.$store.getters['user/userObj'].avatarUrl
     },
     givenName () {
-      const name = this.$store.state.user.person.name()
-      return name || 'Nameless Person'
+      return this.$store.getters['user/userObj'].name
     },
     currentStatus () {
       return this.$store.state.user.currentStatus

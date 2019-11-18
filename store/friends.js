@@ -28,7 +28,7 @@ export const actions = {
     const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
     console.log(updated)
     if (loadProfiles) {
-      dispatch('LOAD_PROFILES')
+      dispatch('LOAD_FRIENDS_PROFILES')
     }
   },
   async REMOVE_FRIEND ({ commit, rootState, state }, friend) {
@@ -36,32 +36,39 @@ export const actions = {
     commit('M_FRIENDS', newFriends)
     await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
   },
-  async LOAD_FRIENDS ({ commit, rootState }) {
+  async LOAD_FRIENDS ({ commit, rootState, dispatch }, { loadProfiles }) {
     console.log('load frinds')
     const file = await rootState.user.userSession.getFile('friends.json')
     const friends = JSON.parse(file)
     commit('M_FRIENDS', friends)
-  },
-  async LOAD_PROFILES ({ commit, state, dispatch }) {
-    if (state.friends.length === 0) {
-      await dispatch('LOAD_FRIENDS')
+    if (loadProfiles) {
+      dispatch('LOAD_FRIENDS_PROFILES')
     }
-    const loadedFriends = state.friends.map(async (id) => {
-      const userData = await lookupProfile(id)
-      console.log(userData)
-      const person = new Person(userData)
-      person.username = id
-      return person
-    })
-    commit('M_LOADED_FRIENDS', await Promise.all(loadedFriends))
   },
   async LOAD_PROFILE ({ commit, state }, id) {
-    const loaded = state.loadedFriends.filter(elem => elem === id)
-    if (loaded.length === 0) {
-      const userData = await lookupProfile(id)
-      const person = new Person(userData)
-      person.username = id
-      commit('M_LOADED_FRIENDS', state.loadedFriends.concat(person))
+    const userData = await lookupProfile(id)
+    const person = new Person(userData)
+    person.username = id
+    commit('M_LOADED_FRIENDS', state.loadedFriends.concat(person))
+  },
+  LOAD_FRIENDS_PROFILES ({ getters, state, dispatch }) {
+    const loaded = getters.loadedObj.map(elem => elem.username)
+    const toLoad = state.friends.filter(elem => !loaded.includes(elem))
+    for (let i = 0; i < toLoad.length; i++) {
+      dispatch('LOAD_PROFILE', toLoad[i])
     }
+  }
+}
+
+export const getters = {
+  loadedObj (state) {
+    return state.loadedFriends.map((elem) => {
+      return {
+        name: elem.name() || elem.username,
+        description: elem.description(),
+        avatarUrl: elem.avatarUrl() || 'https://s3.amazonaws.com/onename/avatar-placeholder.png',
+        username: elem.username
+      }
+    })
   }
 }

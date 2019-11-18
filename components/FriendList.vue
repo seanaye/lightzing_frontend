@@ -1,17 +1,17 @@
 <template>
   <v-list two-line>
-    <template v-for="(friend, i) in friends">
+    <template v-for="(friend, i) in friendsObj">
       <v-list-item
         @click="goToProfile(friend.username)"
         :key="i * 2 + 1"
       >
         <v-list-item-avatar>
-          <v-img :src="friend.avatarUrl () || 'https://s3.amazonaws.com/onename/avatar-placeholder.png'"></v-img>
+          <v-img :src="friend.avatarUrl"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title v-html="friend.name() || 'Nameless Person'">
+          <v-list-item-title v-html="friend.name">
           </v-list-item-title>
-          <v-list-item-subtitle v-text="friend.description()">
+          <v-list-item-subtitle v-text="friend.description">
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -23,11 +23,11 @@
 <script>
 export default {
   created () {
-    this.$store.dispatch('friends/LOAD_PROFILES')
+    this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: true })
   },
   computed: {
-    friends () {
-      return this.$store.state.friends.loadedFriends
+    friendsObj () {
+      return this.$store.getters['friends/loadedObj']
     }
   },
   methods: {

@@ -72,3 +72,18 @@ export const actions = {
     }
   }
 }
+
+export const getters = {
+  userObj (state) {
+    if (state.person) {
+      return {
+        username: state.userData.username,
+        name: state.person.name(),
+        description: state.person.description(),
+        avatarUrl: state.person.avatarUrl() || 'https://s3.amazonaws.com/onename/avatar-placeholder.png'
+      }
+    } else {
+      return {}
+    }
+  }
+}

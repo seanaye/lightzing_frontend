@@ -42,7 +42,7 @@
                       :color="(isFriend) ? 'red lighten-1': 'green lighten-1'"
                       @click="addOrRemove"
                     >
-                      {{ (isFriend) ? '- Remove Friend' : '+ Add Friend' }}
+                      {{ (isFriend) ? '- Unfollow' : '+ Follow' }}
                     </v-btn>
                   </v-col>
                   <v-col v-else cols="auto">
@@ -67,8 +67,9 @@
           <v-row justify="center" dense>
             <v-spacer></v-spacer>
             <v-col cols="auto">
-              <v-card-actions v-if="isFriend">
-                <v-btn @click="showExpense">Add Expense</v-btn>
+              <v-card-actions>
+                <v-btn v-if="isFriend" @click="showExpense">Add Expense</v-btn>
+                <span v-else>Follow this user to split expenses</span>
               </v-card-actions>
             </v-col>
           </v-row>
@@ -81,6 +82,10 @@
 <script>
 
 export default {
+  transition: {
+    name: 'fade-transition',
+    mode: 'out-in'
+  },
   middleware: 'auth',
   data () {
     return {
@@ -144,7 +149,9 @@ export default {
       }
     },
     showExpense () {
-      this.$store.commit('M_EXPENSE_DIALOG', { show: true, splitWith: [this.$route.params.id] })
+      const splitWith = this.$store.state.splitWith
+      this.$store.commit('M_EXPENSE_DIALOG', { show: true, splitWith: splitWith.concat(this.$route.params.id) })
+      this.$router.push('/newexpense')
     },
     loadImage () {
       const image = new Image()
@@ -162,7 +169,7 @@ export default {
   },
   created () {
     if (this.$store.state.friends.friends.length === 0) {
-      this.$store.dispatch('friends/LOAD_FRIENDS')
+      this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: false })
     }
     if (this.avatarUrl) {
       this.loadImage()
