@@ -40,7 +40,7 @@ export const actions = {
     console.log('load frinds')
     const file = await rootState.user.userSession.getFile('friends.json')
     const friends = JSON.parse(file)
-    commit('M_FRIENDS', friends)
+    commit('M_FRIENDS', friends || [])
     if (loadProfiles) {
       dispatch('LOAD_FRIENDS_PROFILES')
     }
