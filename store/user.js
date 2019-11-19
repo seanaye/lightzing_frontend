@@ -1,22 +1,22 @@
 import { Person, hexStringToECPair } from 'blockstack'
 
 export const state = () => ({
-  signedIn: false,
   userSession: null,
   userData: null,
   person: null,
-  currentStatus: ''
+  currentStatus: '',
+  redirect: '',
+  hasPublicKey: false
 })
 
 export const mutations = {
-  M_SESSION (state, session) {
-    state.userSession = session
+  CREATE_SESSION (state) {
+    state.userSession = this.$createSession()
   },
   M_CURRENT_STATUS (state, status) {
     state.currentStatus = status
   },
   INIT_USERDATA (state, userdata) {
-    state.signedIn = true
     state.userData = userdata
     state.person = new Person(userdata.profile)
     console.log(state.person)
@@ -26,23 +26,17 @@ export const mutations = {
     state.signedIn = false
     state.userData = null
     state.person = null
+    state.userSession = null
+  },
+  M_REDIRECT_URL (state, url) {
+    state.redirect = url
+  },
+  M_HAS_PUBLIC (state, value) {
+    state.hasPublicKey = value
   }
 }
 
 export const actions = {
-  async INIT_SESSION ({ commit, state, dispatch }) {
-    const session = this.$createSession()
-    commit('M_SESSION', session)
-    if (session.isUserSignedIn()) {
-      commit('INIT_USERDATA', session.loadUserData())
-    } else if (session.isSignInPending()) {
-      commit('INIT_USERDATA', await session.handlePendingSignIn())
-    } else {
-      // Delete this in favor of login dialog in root state
-      state.userSession.redirectToSignIn(window.location.href)
-    }
-    await dispatch('ENSURE_PUBLIC_KEY')
-  },
   async UPDATE_STATUS ({ commit, state }, newStatus) {
     const status = {
       status: newStatus,
@@ -62,13 +56,20 @@ export const actions = {
     commit('LOGOUT')
     commit('friends/LOGOUT', '', { root: true })
   },
-  async ENSURE_PUBLIC_KEY ({ state }) {
-    const file = await state.userSession.getFile('public_key.json', { decrypt: false })
-    console.log(file)
+  async ENSURE_PUBLIC_KEY ({ state, commit }) {
+    if (state.hasPublicKey) {
+      return
+    }
+    const file = await state.userSession.getFile('public_key.json', { decrypt: false }).catch(e => console.log(e))
     if (!file) {
       console.log('putting public key')
       const appPublicKey = hexStringToECPair(state.userData.appPrivateKey).publicKey.toString('hex')
-      await state.userSession.putFile('public_key.json', JSON.stringify({ appPublicKey }), { sign: true })
+      const r = await state.userSession.putFile('public_key.json', JSON.stringify({ appPublicKey }), { sign: true }).catch(e => console.log(e))
+      if (r) {
+        commit('M_HAS_PUBLIC', true)
+      }
+    } else {
+      commit('M_HAS_PUBLIC', true)
     }
   }
 }

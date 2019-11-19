@@ -240,12 +240,8 @@ export default {
       this.$store.commit('M_EXPENSE_DIALOG', { show: true, splitWith: newIDs })
     },
     async getExchangeRate () {
-      try {
-        const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true')
-        this.exchangeRate = req.data
-      } catch (err) {
-        console.log(err)
-      }
+      const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true').catch(e => console.log(e))
+      this.exchangeRate = req.data
     },
     cancel () {
       this.$router.back()

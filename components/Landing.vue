@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     signIn () {
-      this.userSession.redirectToSignIn('http://localhost:3000/block')
+      this.userSession.redirectToSignIn(window.location.href)
     }
   }
 }

@@ -160,20 +160,26 @@ export default {
         this.imageLoaded = true
       }
       image.src = this.avatarUrl
+    },
+    loadData () {
+      if (this.$store.state.friends.friends.length === 0 && this.userData) {
+        this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: false })
+      }
+      if (this.avatarUrl && !this.imageLoaded) {
+        this.loadImage()
+      }
     }
   },
   watch: {
     avatarUrl () {
       this.loadImage()
+    },
+    userData () {
+      this.loadData()
     }
   },
   created () {
-    if (this.$store.state.friends.friends.length === 0) {
-      this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: false })
-    }
-    if (this.avatarUrl) {
-      this.loadImage()
-    }
+    this.loadData()
   }
 }
 </script>

@@ -109,6 +109,11 @@ export default {
           icon: 'mdi-apps',
           title: 'Block',
           to: '/block'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Sean Profile',
+          to: '/user/seanwaye.id.blockstack'
         }
       ],
       miniVariant: false,

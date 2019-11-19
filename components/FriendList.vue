@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     goToProfile (id) {
-      this.$router.push(`user/${id}`)
+      this.$router.push(`/user/${id}`)
     }
   }
 }

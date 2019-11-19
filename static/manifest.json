@@ -1,6 +1,5 @@
 {
   "name": "Hello, Blockstack App",
-  "start_url": "http://localhost:3000/block/",
   "description": "A simple Hello, Blockstack app",
   "icons": [{
     "src": "favicon.ico",
