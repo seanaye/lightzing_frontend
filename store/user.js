@@ -55,6 +55,7 @@ export const actions = {
   LOGOUT ({ commit }) {
     commit('LOGOUT')
     commit('friends/LOGOUT', '', { root: true })
+    this.$router.push('/')
   },
   async ENSURE_PUBLIC_KEY ({ state, commit }) {
     if (state.hasPublicKey) {

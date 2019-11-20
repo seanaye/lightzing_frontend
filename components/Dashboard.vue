@@ -93,7 +93,7 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('user/LOAD_STATUS')
+    // this.$store.dispatch('user/LOAD_STATUS')
   },
   computed: {
     avatar () {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <landing v-if="! $store.state.user.signedIn"></landing>
+    <landing v-if="!userSession.isUserSignedIn()"></landing>
     <dashboard v-if="person" :user="person"></dashboard>
   </div>
 </template>

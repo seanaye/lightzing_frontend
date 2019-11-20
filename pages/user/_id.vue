@@ -64,12 +64,18 @@
             </v-col>
           </v-row>
           <v-divider></v-divider>
-          <v-row justify="center" dense>
+          <v-row justify="center" dense v-if="!isLocal">
             <v-spacer></v-spacer>
             <v-col cols="auto">
               <v-card-actions>
-                <v-btn v-if="isFriend" @click="showExpense">Add Expense</v-btn>
-                <span v-else>Follow this user to split expenses</span>
+                <v-tooltip bottom :disabled="isFriend">
+                  <template v-slot:activator="{ on }">
+                    <div v-on="on">
+                      <v-btn @click="showExpense" :disabled="!isFriend">Add Expense</v-btn>
+                    </div>
+                  </template>
+                  <span>Follow this user to split expenses</span>
+                </v-tooltip>
               </v-card-actions>
             </v-col>
           </v-row>
@@ -113,7 +119,7 @@ export default {
         if (this.isLocal) {
           return this.$store.state.user.person
         } else {
-          const profile = this.$store.state.friends.loadedFriends.filter(elem => elem.username === this.$route.params.id)
+          const profile = this.$store.state.friends.loadedProfiles.filter(elem => elem.username === this.$route.params.id)
           // return (profile.length > 0) ? profile[0] : ''
           if (profile.length > 0) {
             return profile[0]

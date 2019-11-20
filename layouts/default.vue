@@ -101,14 +101,9 @@ export default {
           to: '/'
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
-        },
-        {
-          icon: 'mdi-apps',
-          title: 'Block',
-          to: '/block'
+          icon: 'mdi-account',
+          title: 'My Dashboard',
+          to: '/dashboard'
         },
         {
           icon: 'mdi-chart-bubble',
