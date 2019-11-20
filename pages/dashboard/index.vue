@@ -2,19 +2,19 @@
   <v-container>
     <v-row justify="start">
       <v-col cols="12">
-        <v-card color="blue darken-3" elevation="12">
+        <v-card color="primary" elevation="12">
           <UserProfile :id="userId"></UserProfile>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6">
-        <v-card color="purple darken-4" class="px-3 py-3" elevation="12">
-          <FriendSearch color="purple darken-4"></FriendSearch>
+        <v-card color="info darken-2" class="px-3 py-3" elevation="12">
+          <FriendSearch color="info darken-2"></FriendSearch>
           <v-progress-linear
             :active="$store.state.friends.isLoading"
             indeterminate
           >
           </v-progress-linear>
-          <FriendList color="purple darken-4"></FriendList>
+          <FriendList color="info darken-2"></FriendList>
         </v-card>
       </v-col>
     </v-row>

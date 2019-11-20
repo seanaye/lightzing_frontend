@@ -16,7 +16,12 @@
             <v-card-actions style="width: 100%;">
               <v-row justify="center" no-gutters>
                 <v-col cols="12" md="8" lg="6">
-                  <v-btn block color="blue" @click="signIn">
+                  <v-btn
+                    block
+                    color="blue"
+                    @click="signIn"
+                    :loading="redirecting"
+                  >
                     Sign Up/Login
                   </v-btn>
                 </v-col>
@@ -31,12 +36,18 @@
 <script>
 export default {
   middleware: 'signin',
+  data () {
+    return {
+      redirecting: false
+    }
+  },
   methods: {
     signIn () {
+      this.redirecting = true
       if (!this.$store.state.user.userSession) {
         this.$store.commit('user/CREATE_SESSION')
       }
-      const url = this.$store.state.user.redirect || '/block'
+      const url = this.$store.state.user.redirect || '/dashboard'
       console.log({ url })
       this.$store.state.user.userSession.redirectToSignIn(window.location.origin + url)
     }

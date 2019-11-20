@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" sm="10" lg="8">
-        <v-card color="blue darken-3" elevation="12">
+        <v-card color="primary" elevation="12">
           <v-row justify="space-around" dense>
             <v-col cols="12" sm="3" lg="2" class="text-center">
               <v-fade-transition mode="out-in">
@@ -33,13 +33,13 @@
                     <v-btn
                       v-if="isLocal"
                       rounded
-                      color="purple"
+                      color="info"
                       @click="$store.dispatch('user/LOGOUT')"
                     >Sign Out</v-btn>
                     <v-btn
                       v-else
                       rounded
-                      :color="(isFriend) ? 'red lighten-1': 'green lighten-1'"
+                      :color="(isFriend) ? 'error': 'success'"
                       @click="addOrRemove"
                     >
                       {{ (isFriend) ? '- Unfollow' : '+ Follow' }}

@@ -3,7 +3,7 @@ import { lookupProfile, Person } from 'blockstack'
 export const state = () => ({
   friends: [],
   loadedProfiles: [],
-  isLoading: false
+  isLoading: 0
 })
 
 export const mutations = {
@@ -18,7 +18,11 @@ export const mutations = {
     state.loadedProfiles = []
   },
   M_ISLOADING (state, value) {
-    state.isLoading = value
+    if (value) {
+      state.isLoading += 1
+    } else {
+      state.isLoading -= 1
+    }
   }
 }
 

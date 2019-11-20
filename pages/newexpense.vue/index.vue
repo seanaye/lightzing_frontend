@@ -2,7 +2,9 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12">
-        <ExpenseCard></ExpenseCard>
+        <v-card color="primary">
+          <ExpenseCard color="primary"></ExpenseCard>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>

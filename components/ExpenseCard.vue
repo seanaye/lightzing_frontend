@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <div>
     <v-row align="center" justify="space-around" dense>
       <v-col cols="10" md="4" lg="3">
         <v-select
@@ -70,8 +70,8 @@
     <v-row align="center" justify="center" justify-md="space-around" dense>
       <v-col cols="10" sm="2">
         <v-radio-group v-model="currency">
-          <v-radio label="Satoshi" value="Satoshi" color="blue"></v-radio>
-          <v-radio label="USD" value="USD" color="blue"></v-radio>
+          <v-radio label="Satoshi" value="Satoshi" color="warning"></v-radio>
+          <v-radio label="USD" value="USD" color="warning"></v-radio>
         </v-radio-group>
       </v-col>
       <v-col cols="10" sm="8" md="3" lg="4">
@@ -95,7 +95,7 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="10">
-        <v-list>
+        <v-list :color="color">
           <v-divider></v-divider>
           <template v-for="(item, i) in splitWithObj">
             <v-list-item  :key="item.username">
@@ -123,7 +123,8 @@
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
-                  color="blue"
+                  color="secondary"
+                  dark
                   :disabled="invalidPost"
                 >Post!</v-btn>
               </div>
@@ -134,12 +135,15 @@
       </v-col>
       <v-col cols="1"></v-col>
     </v-row>
-  </v-card>
+  </div>
 </template>
 
 <script>
 
 export default {
+  props: {
+    color: String
+  },
   data () {
     return {
       exchangeRate: 0
@@ -220,7 +224,7 @@ export default {
     },
     invalidPost () {
       const validAmount = (this.currency === 'USD') ? Boolean(this.payAmount) : this.payAmount >= 1000
-      return !this.payDescription || !validAmount
+      return !this.payDescription || !validAmount || this.splitWithObj.length === 0
     },
     errorMsg () {
       if (!this.payAmount) {
@@ -229,6 +233,8 @@ export default {
         return 'Please enter an amount greater than 1000 Satoshi'
       } else if (!this.payDescription) {
         return 'Please enter a description for the payment'
+      } else if (this.splitWithObj.length === 0) {
+        return 'Select one or more other users to split this expense with'
       } else {
         return ''
       }

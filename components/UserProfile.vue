@@ -30,13 +30,13 @@
               <v-btn
                 v-if="isLocal"
                 rounded
-                color="purple"
+                color="warning"
                 @click="$store.dispatch('user/LOGOUT')"
               >Sign Out</v-btn>
               <v-btn
                 v-else
                 rounded
-                :color="(isFriend) ? 'red lighten-1': 'green lighten-1'"
+                :color="(isFriend) ? 'error': 'success'"
                 @click="addOrRemove"
               >
                 {{ (isFriend) ? '- Unfollow' : '+ Follow' }}
