@@ -3,10 +3,15 @@ import blockstack from 'blockstack'
 export default (ctx, inject) => {
   inject('createSession', () => {
     const appConfig = new blockstack.AppConfig(
-      ['store_write', 'publish_data'],
-      'http://localhost:3000',
-      '/block'
+      ['store_write', 'publish_data', 'email'],
+      window.location.origin,
+      '/dashboard',
+      '/manifest.json'
     )
-    return new blockstack.UserSession(appConfig)
+    console.log({ appConfig })
+    return new blockstack.UserSession({ appConfig })
+  })
+  inject('blockstack', () => {
+    return blockstack
   })
 }

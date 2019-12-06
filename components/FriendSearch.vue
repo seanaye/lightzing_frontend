@@ -12,7 +12,10 @@
       </template>
     </v-text-field>
     <v-slide-y-transition mode="out-in">
-      <v-list v-if="completedQuery" :color="color">
+      <v-list
+        v-if="completedQuery && !$store.state.friends.isLoading"
+        :color="color"
+      >
         <v-list-item v-if="loadedUserObj" @click="$router.push(`/user/${loadedUserObj.username}`)">
           <v-list-item-avatar>
             <v-img :src="loadedUserObj.avatarUrl"></v-img>

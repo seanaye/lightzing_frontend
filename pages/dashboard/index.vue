@@ -1,20 +1,25 @@
 <template>
   <v-container>
-    <v-row justify="start">
-      <v-col cols="12">
+    <v-row justify="center">
+      <v-col cols="12" sm="10">
         <v-card color="primary" elevation="12">
           <UserProfile :id="userId"></UserProfile>
         </v-card>
       </v-col>
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="10">
         <v-card color="info darken-2" class="px-3 py-3" elevation="12">
           <FriendSearch color="info darken-2"></FriendSearch>
           <v-progress-linear
-            :active="$store.state.friends.isLoading"
+            :active="$store.state.friends.isLoading > 0"
             indeterminate
           >
           </v-progress-linear>
           <FriendList color="info darken-2"></FriendList>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="10">
+        <v-card color="purple" elevation="12">
+          <PaymentFeed></PaymentFeed>
         </v-card>
       </v-col>
     </v-row>
@@ -25,12 +30,14 @@
 import UserProfile from '~/components/UserProfile'
 import FriendList from '~/components/FriendList'
 import FriendSearch from '~/components/FriendSearch'
+import PaymentFeed from '~/components/PaymentFeed'
 
 export default {
   components: {
     UserProfile,
     FriendSearch,
-    FriendList
+    FriendList,
+    PaymentFeed
   },
   transition: {
     name: 'fade-transition',

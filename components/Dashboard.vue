@@ -75,25 +75,14 @@ export default {
       this.newStatus = ''
     },
     async searchUser () {
-      try {
-        const result = await lookupProfile(this.searchUserQuery)
-        console.log(result)
-        if (result) {
-          this.$store.dispatch('friends/ADD_FRIENDS', { friends: [this.searchUserQuery], loadProfiles: true })
-        }
-      } catch (err) {
-        console.log(err)
+      const result = await lookupProfile(this.searchUserQuery)
+        .catch(e => console.error(e))
+      if (result) {
+        this.$store.dispatch('friends/ADD_FRIENDS', { friends: [this.searchUserQuery], loadProfiles: true })
       }
-      // const options = {
-      //   username: this.searchUserQuery,
-      //   decrypt: false
-      // }
-      // const status = await this.$store.state.user.userSession.getFile('status.json', options)
-      // console.log(status)
     }
   },
   created () {
-    // this.$store.dispatch('user/LOAD_STATUS')
   },
   computed: {
     avatar () {

@@ -1,4 +1,4 @@
-import { Person, hexStringToECPair } from 'blockstack'
+import { Person, decodeToken, hexStringToECPair } from 'blockstack'
 
 export const state = () => ({
   userSession: null,
@@ -6,6 +6,7 @@ export const state = () => ({
   person: null,
   currentStatus: '',
   redirect: '',
+  pubkey: '',
   hasPublicKey: false
 })
 
@@ -19,6 +20,9 @@ export const mutations = {
   INIT_USERDATA (state, userdata) {
     state.userData = userdata
     state.person = new Person(userdata.profile)
+    const decodedToken = decodeToken(userdata.authResponseToken)
+    console.log({ decodedToken })
+    state.pubkey = decodedToken.payload.public_keys[0]
     console.log(state.person)
   },
   LOGOUT (state) {
@@ -31,8 +35,8 @@ export const mutations = {
   M_REDIRECT_URL (state, url) {
     state.redirect = url
   },
-  M_HAS_PUBLIC (state, value) {
-    state.hasPublicKey = value
+  M_HAS_PUBLIC (state, bool) {
+    state.hasPublicKey = bool
   }
 }
 
@@ -58,14 +62,22 @@ export const actions = {
     this.$router.push('/')
   },
   async ENSURE_PUBLIC_KEY ({ state, commit }) {
-    if (state.hasPublicKey) {
-      return
-    }
-    const file = await state.userSession.getFile('public_key.json', { decrypt: false }).catch(e => console.log(e))
-    if (!file) {
+    // if (state.hasPublicKey) {
+    //   return
+    // }
+    const file = await state.userSession.getFile('publicKey.json', { decrypt: false, verify: true })
+      .catch(e => console.error(e))
+    console.log({ file })
+    if (!file || file) {
       console.log('putting public key')
       const appPublicKey = hexStringToECPair(state.userData.appPrivateKey).publicKey.toString('hex')
-      const r = await state.userSession.putFile('public_key.json', JSON.stringify({ appPublicKey }), { sign: true }).catch(e => console.log(e))
+      const publicKeyData = { appPublicKey }
+      const r = await state.userSession.putFile(
+        'publicKey.json',
+        JSON.stringify(publicKeyData),
+        { sign: true, encrypt: false }
+      )
+        .catch(e => console.error(e))
       if (r) {
         commit('M_HAS_PUBLIC', true)
       }

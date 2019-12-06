@@ -3,7 +3,8 @@ import { lookupProfile, Person } from 'blockstack'
 export const state = () => ({
   friends: [],
   loadedProfiles: [],
-  isLoading: 0
+  isLoading: 0.,
+  loadingAll: false
 })
 
 export const mutations = {
@@ -23,6 +24,9 @@ export const mutations = {
     } else {
       state.isLoading -= 1
     }
+  },
+  M_LOADING_ALL (state, value) {
+    state.loadingAll = value
   }
 }
 
@@ -34,6 +38,7 @@ export const actions = {
     ].filter(elem => elem !== rootState.user.userData.username)
     commit('M_FRIENDS', newFriends)
     const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
+      .catch(e => console.error(e))
     console.log(updated)
     if (loadProfiles) {
       dispatch('LOAD_FRIENDS_PROFILES')
@@ -41,37 +46,58 @@ export const actions = {
     commit('M_ISLOADING', false)
   },
   async REMOVE_FRIEND ({ commit, rootState, state }, friend) {
+    commit('M_ISLOADING', true)
     const newFriends = state.friends.filter(elem => elem !== friend)
     commit('M_FRIENDS', newFriends)
     await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
+      .catch(e => console.error(e))
+    commit('M_ISLOADING', false)
   },
   async LOAD_FRIENDS ({ commit, rootState, dispatch }, { loadProfiles }) {
     commit('M_ISLOADING', true)
     console.log('load frinds')
     const file = await rootState.user.userSession.getFile('friends.json')
+      .catch(e => console.error(e))
     const friends = JSON.parse(file)
     commit('M_FRIENDS', friends || [])
     if (loadProfiles) {
-      dispatch('LOAD_FRIENDS_PROFILES')
+      await dispatch('LOAD_FRIENDS_PROFILES')
     }
     commit('M_ISLOADING', false)
   },
-  async LOAD_PROFILE ({ commit, state }, id) {
-    commit('M_ISLOADING', true)
-    if (!state.loadedProfiles.reduce((acc, elem) => { return acc || elem.username === id }, false)) {
+  async LOAD_PROFILE ({ commit, state, rootState }, id) {
+    if (!state.loadedProfiles.map(elem => elem.username).includes(id)) {
+      commit('M_ISLOADING', true)
       const userData = await lookupProfile(id)
+        .catch(e => console.error(e))
       const person = new Person(userData)
       person.username = id
-      commit('M_LOADED_PROFILES', state.loadedProfiles.concat(person))
+      const pubKey = await rootState.user.userSession.getFile('publicKey.json', { username: id, verify: true, decrypt: false })
+        .catch(e => console.log(e))
+      console.log({ pubKey })
+      if (pubKey) {
+        person.pubkey = JSON.parse(pubKey).appPublicKey
+      } else {
+        console.error(`Could not retrive public key for ${id}`)
+      }
+      if (!state.loadedProfiles.map(elem => elem.username).includes(id)) {
+        commit('M_LOADED_PROFILES', state.loadedProfiles.concat(person))
+      }
+      commit('M_ISLOADING', false)
     }
-    commit('M_ISLOADING', false)
   },
-  LOAD_FRIENDS_PROFILES ({ getters, state, dispatch }) {
+  async LOAD_FRIENDS_PROFILES ({ getters, state, dispatch, commit }) {
+    if (state.loadingAll) {
+      return
+    }
+    commit('M_LOADING_ALL', true)
     const loaded = getters.loadedObj.map(elem => elem.username)
     const toLoad = state.friends.filter(elem => !loaded.includes(elem))
-    for (let i = 0; i < toLoad.length; i++) {
-      dispatch('LOAD_PROFILE', toLoad[i])
+    for (const id of toLoad) {
+      await dispatch('LOAD_PROFILE', id)
+      console.log(`loaded ${id}`)
     }
+    commit('M_LOADING_ALL', false)
   }
 }
 
@@ -82,7 +108,8 @@ export const getters = {
         name: elem.name() || elem.username,
         description: elem.description(),
         avatarUrl: elem.avatarUrl() || 'https://s3.amazonaws.com/onename/avatar-placeholder.png',
-        username: elem.username
+        username: elem.username,
+        pubkey: elem.pubkey
       }
     })
   },
@@ -97,7 +124,8 @@ export const getters = {
         name: elem.name() || elem.username,
         description: elem.description(),
         avatarUrl: elem.avatarUrl() || 'https://s3.amazonaws.com/onename/avatar-placeholder.png',
-        username: elem.username
+        username: elem.username,
+        pubkey: elem.pubkey
       }
     })
   }

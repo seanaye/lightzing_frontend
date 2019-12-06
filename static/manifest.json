@@ -1,6 +1,6 @@
 {
-  "name": "Hello, Blockstack App",
-  "description": "A simple Hello, Blockstack app",
+  "name": "Lightzing.me",
+  "description": "Follow friends and instantly spilt expenses over lightning network",
   "icons": [{
     "src": "favicon.ico",
     "sizes": "400x400",

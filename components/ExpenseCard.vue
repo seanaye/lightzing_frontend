@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <v-row align="center" justify="space-around" dense>
       <v-col cols="10" md="4" lg="3">
         <v-select
@@ -35,6 +35,8 @@
         <v-autocomplete
           v-model="splitWith"
           :items="payables"
+          :loading="($store.state.friends.isLoading > 0) ? 'yellow' : false"
+          color="yellow"
           filled
           chips
           label="Split Between:"
@@ -80,6 +82,7 @@
           v-model="payAmount"
           :suffix="currency"
           label="Split Amount: "
+          color="yellow"
         ></v-text-field>
       </v-col>
       <v-col cols="10" sm="8" md="3" lg="4">
@@ -87,6 +90,7 @@
           type="text"
           v-model="payDescription"
           label="Description"
+          color="yellow"
         ></v-text-field>
       </v-col>
       <v-col cols="10" md="5" class="text-center">
@@ -126,6 +130,7 @@
                   color="secondary"
                   dark
                   :disabled="invalidPost"
+                  @click="postPayment"
                 >Post!</v-btn>
               </div>
             </template>
@@ -135,7 +140,7 @@
       </v-col>
       <v-col cols="1"></v-col>
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -246,11 +251,24 @@ export default {
       this.$store.commit('M_EXPENSE_DIALOG', { show: true, splitWith: newIDs })
     },
     async getExchangeRate () {
-      const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true').catch(e => console.log(e))
+      const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true')
+        .catch(e => console.error(e))
       this.exchangeRate = req.data
     },
     cancel () {
       this.$router.back()
+    },
+    postPayment () {
+      for (const payer of this.splitWithObj) {
+        this.$store.dispatch('payment/POST_PAYMENT',
+          {
+            amount: this.payAmount / this.splitWith.length,
+            id: payer.username,
+            desc: this.payDescription,
+            to: this.selectedPaidBy.username
+          }
+        )
+      }
     }
   },
   created () {
