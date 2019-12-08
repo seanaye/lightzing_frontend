@@ -5,7 +5,8 @@ export const state = () => ({
   selectedPaidBy: '',
   payAmount: 0,
   currency: 'USD',
-  payDescription: ''
+  payDescription: '',
+  exchangeRate: 0
 })
 
 export const mutations = {
@@ -30,5 +31,17 @@ export const mutations = {
   },
   M_PAY_DESCRIPTION (state, value) {
     state.payDescription = value
+  },
+  M_EXCHANGE_RATE (state, value) {
+    state.exchangeRate = value
+  }
+}
+
+export const actions = {
+  async GET_EXCHANGE_RATE ({ commit }) {
+    const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true')
+      .catch(e => console.error(e))
+    console.log({ req })
+    commit('M_EXCHANGE_RATE', req.data)
   }
 }

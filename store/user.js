@@ -21,9 +21,7 @@ export const mutations = {
     state.userData = userdata
     state.person = new Person(userdata.profile)
     const decodedToken = decodeToken(userdata.authResponseToken)
-    console.log({ decodedToken })
     state.pubkey = decodedToken.payload.public_keys[0]
-    console.log(state.person)
   },
   LOGOUT (state) {
     state.userSession.signUserOut()
@@ -47,13 +45,11 @@ export const actions = {
       created: Date.now()
     }
     const updated = await state.userSession.putFile('status.json', JSON.stringify(status), { encrypt: false })
-    console.log(updated)
     commit('M_CURRENT_STATUS', status.status)
   },
   async LOAD_STATUS ({ commit, state }) {
     const file = await state.userSession.getFile('status.json', { decrypt: false })
     const status = JSON.parse(file)
-    console.log(status)
     commit('M_CURRENT_STATUS', status.status)
   },
   LOGOUT ({ commit }) {
@@ -67,7 +63,6 @@ export const actions = {
     // }
     const file = await state.userSession.getFile('publicKey.json', { decrypt: false, verify: true })
       .catch(e => console.error(e))
-    console.log({ file })
     if (!file || file) {
       console.log('putting public key')
       const appPublicKey = hexStringToECPair(state.userData.appPrivateKey).publicKey.toString('hex')

@@ -49,7 +49,6 @@ export default {
         this.$store.commit('user/CREATE_SESSION')
       }
       const url = this.$store.state.user.redirect || '/dashboard'
-      console.log({ url })
       this.$store.state.user.userSession.redirectToSignIn(window.location.origin + url)
     }
   }

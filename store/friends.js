@@ -39,7 +39,6 @@ export const actions = {
     commit('M_FRIENDS', newFriends)
     const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
       .catch(e => console.error(e))
-    console.log(updated)
     if (loadProfiles) {
       dispatch('LOAD_FRIENDS_PROFILES')
     }
@@ -74,7 +73,6 @@ export const actions = {
       person.username = id
       const pubKey = await rootState.user.userSession.getFile('publicKey.json', { username: id, verify: true, decrypt: false })
         .catch(e => console.log(e))
-      console.log({ pubKey })
       if (pubKey) {
         person.pubkey = JSON.parse(pubKey).appPublicKey
       } else {

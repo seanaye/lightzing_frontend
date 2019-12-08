@@ -8,7 +8,6 @@ export default (ctx, inject) => {
       '/dashboard',
       '/manifest.json'
     )
-    console.log({ appConfig })
     return new blockstack.UserSession({ appConfig })
   })
   inject('blockstack', () => {

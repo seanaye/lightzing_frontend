@@ -64,7 +64,7 @@ export const state = () => ({
 export const mutations = {
   ADD_PAYMENT (state, { poster, postee, payment }) {
     const key = `${poster}->${postee}`
-    state.payments[key] = payment
+    state.payments = { ...state.payments, [key]: payment }
   },
   IS_POSTING (state, { isPosting, postSuccessFail }) {
     state.isPosting = isPosting
@@ -165,7 +165,6 @@ export const actions = {
       false,
       rootState.user.userSession
     )
-    console.log({ otherKey: keyObj })
     const payment = await retrievePost(
       id,
       username,
@@ -178,7 +177,6 @@ export const actions = {
     commit('IS_LOADING', false)
   },
   async LOAD_SELF_PAYMENT ({ commit, rootState }, id) {
-    console.log('load self payment')
     commit('IS_LOADING', true)
     const username = rootState.user.userData.username
     const keyObj = await retrieveKey(
@@ -187,14 +185,12 @@ export const actions = {
       true,
       rootState.user.userSession
     )
-    console.log({ selfKey: keyObj })
     const payment = await retrievePost(
       username,
       id,
       keyObj,
       rootState.user.userSession
     )
-    console.log({ selfPayment: payment })
     if (payment) {
       commit('ADD_PAYMENT', { poster: username, postee: id, payment })
     }
@@ -212,5 +208,32 @@ export const getters = {
         return 1
       }
     })
+  },
+  totalReceivable (state, getters, rootState) {
+    const toMe = getters.sortedPayments.filter((elem) => {
+      return elem.to === rootState.user.userData.username
+    })
+    return toMe.reduce((acc, elem) => {
+      if (elem.currency === 'satoshi') {
+        return acc + elem.amount * 0.00000001 / rootState.exchangeRate
+      } else {
+        return acc + elem.amount
+      }
+    }, 0)
+  },
+  totalPayable (state, getters, rootState) {
+    const fromMe = getters.sortedPayments.filter((elem) => {
+      return elem.from === rootState.user.userData.username
+    })
+    return fromMe.reduce((acc, elem) => {
+      if (elem.currency === 'satoshi') {
+        return acc + elem.amount * 0.00000001 / rootState.exchangeRate
+      } else {
+        return acc + elem.amount
+      }
+    }, 0)
+  },
+  netAmount (state, getters) {
+    return getters.totalReceivable - getters.totalPayable
   }
 }

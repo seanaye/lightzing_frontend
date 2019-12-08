@@ -1,13 +1,30 @@
 <template>
   <v-container>
     <v-row justify="center">
+      <v-slide-y-transition mode="out-in">
+        <v-row v-if="!noPayments" justify="center">
+          <v-col cols="4" style="text-align: center;">
+            You are owed<br>${{$store.getters['payment/totalReceivable']}}
+          </v-col>
+          <v-col cols="4" style="text-align: center;">
+            You owe<br>${{$store.getters['payment/totalPayable']}}
+          </v-col>
+          <v-col cols="4"  style="text-align: center;">
+            Total
+            <br>
+            {{($store.getters['payment/netAmount'] >= 0) ? '+' : '-'}}
+            ${{Math.abs($store.getters['payment/netAmount'])}}
+          </v-col>
+        </v-row>
+      </v-slide-y-transition>
       <v-col cols="12">
-        <v-progress-linear indeterminate :active="$store.state.payment.isLoading > 0">
+        <v-progress-linear indeterminate :active="isLoading">
         </v-progress-linear>
         <div v-if="noPayments">
           You have not posted any payments yet. Follow other users and post payments to track expenses.
         </div>
-        <v-list v-else three-line :color="color">
+        <v-list v-if="!noPayments" three-line :color="color">
+          <v-divider></v-divider>
           <v-slide-y-transition group mode="out-in">
             <template v-for="(payment, i) in payments">
               <v-list-item
@@ -19,10 +36,13 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>
-                    {{payment.from}} owes {{payment.to}} {{payment.amount}} {{payment.currency}}
+                    {{payment.from}} owes {{payment.to}}
+                    {{(payment.currency === 'USD') ? '$' : ''}}{{payment.amount}}
+                    {{(payment.currency !== 'USD') ? payment.currency : ''}}
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    posted by {{payment.poster}} at {{ new Date(payment.time) }}
+                    Description: {{payment.desc}},
+                    Posted by: {{payment.poster}} at {{ new Date(payment.time) }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -38,7 +58,12 @@
 <script>
 export default {
   props: {
-    color: String
+    color: String,
+    poster: {
+      required: false,
+      default: '',
+      type: String
+    }
   },
   data () {
     return {
@@ -47,7 +72,7 @@ export default {
   },
   computed: {
     noPayments () {
-      return this.payments.length === 0 && this.loadingStarted && this.$store.state.payment.isLoading === 0
+      return this.payments.length === 0 && this.loadingStarted && !this.isLoading
     },
     payments () {
       return this.$store.getters['payment/sortedPayments'].map((elem) => {
@@ -67,7 +92,7 @@ export default {
       })
     },
     isLoading () {
-      return this.$store.state.payment.isLoading
+      return this.$store.state.payment.isLoading > 0 || this.$store.state.friends.isLoading > 0
     }
   },
   watch: {

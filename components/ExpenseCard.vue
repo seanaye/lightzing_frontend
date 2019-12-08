@@ -153,12 +153,10 @@ export default {
   props: {
     color: String
   },
-  data () {
-    return {
-      exchangeRate: 0
-    }
-  },
   computed: {
+    exchangeRate () {
+      return this.$store.state.exchangeRate
+    },
     payables () {
       const me = JSON.parse(JSON.stringify(this.me))
       me.name = 'Me'
@@ -250,18 +248,13 @@ export default {
     }
   },
   created () {
-    this.getExchangeRate()
+    this.$store.dispatch('GET_EXCHANGE_RATE')
     this.$store.commit('M_SELECTED_PAID_BY', this.me.username)
   },
   methods: {
     remove (id) {
       const newIDs = this.splitWith.filter(elem => elem !== id)
       this.$store.commit('M_EXPENSE_DIALOG', { show: true, splitWith: newIDs })
-    },
-    async getExchangeRate () {
-      const req = await this.$axios.get('https://blockchain.info/tobtc?currency=USD&value=1&cors=true')
-        .catch(e => console.error(e))
-      this.exchangeRate = req.data
     },
     cancel () {
       this.$router.back()

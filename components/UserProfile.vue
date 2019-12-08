@@ -3,16 +3,36 @@
     <v-row justify="space-around" dense>
       <v-col cols="12" sm="3" lg="2" class="text-center" @click="showQR = !showQR">
         <v-fade-transition mode="out-in">
-          <v-avatar v-if="imageLoaded && !showQR" size="120" class="ma-md-4 pt-5" >
-            <img :src="avatarUrl">
-          </v-avatar>
+          <v-tooltip
+            bottom
+            v-if="imageLoaded && !showQR"
+          >
+            <template v-slot:activator="{ on }">
+              <v-avatar
+                size="150"
+                class="ma-md-4 pt-5"
+                key="avatar"
+                v-on="on"
+              >
+                <img :src="avatarUrl">
+              </v-avatar>
+            </template>
+            <span>Click to share QR code</span>
+          </v-tooltip>
           <vue-qr
             v-else-if="imageLoaded && showQR"
-            :size="120"
-            class="ma-md-4 pt-5"
+            :size="150"
+            class="pt-5"
             :text="`lightzing.me/user/${id}`"
+            :margin="10"
+            key="qr"
           ></vue-qr>
-          <v-skeleton-loader v-else type="image" class="ma-md-4 pt-5" />
+          <v-skeleton-loader
+            v-else
+            type="image"
+            class="ma-md-4 pt-5"
+            key="loader"
+          />
         </v-fade-transition>
       </v-col>
       <v-col cols="10" sm="8" md="8">

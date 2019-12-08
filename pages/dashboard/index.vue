@@ -45,7 +45,6 @@ export default {
     async loadAll () {
       await this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: true })
       for (const friend of this.$store.getters['friends/loadedFriendsObj']) {
-        console.log({ friend })
         this.$store.dispatch('payment/LOAD_OTHER_PAYMENT', friend.username)
         this.$store.dispatch('payment/LOAD_SELF_PAYMENT', friend.username)
       }
