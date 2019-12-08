@@ -8,7 +8,8 @@
               You're almost there...
             </v-card-title>
             <v-card-text>
-              <p>This app requires a blockstack ID to function. Blockstack is a decentralized profile you can create in 30 seconds and holds data that you exclusively own. No strings attached.
+              <p>
+                This app requires a blockstack ID to function. Blockstack is a decentralized profile you can create in 30 seconds and holds data that you exclusively own. No strings attached.
                 <br>
                 Create or login to your blockstack ID below
               </p>
@@ -19,8 +20,8 @@
                   <v-btn
                     block
                     color="blue"
-                    @click="signIn"
                     :loading="redirecting"
+                    @click="signIn"
                   >
                     Sign Up/Login
                   </v-btn>

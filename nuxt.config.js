@@ -34,7 +34,7 @@ export default {
   ],
   render: {
     static: {
-      setHeaders(res, path) {
+      setHeaders (res, path) {
         if (path.includes('manifest.json')) {
           res.setHeader('X-Frame-Options', 'ALLOWALL')
           res.setHeader('Content-Type', 'application/json')

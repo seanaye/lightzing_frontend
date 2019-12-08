@@ -3,7 +3,7 @@ import { lookupProfile, Person } from 'blockstack'
 export const state = () => ({
   friends: [],
   loadedProfiles: [],
-  isLoading: 0.,
+  isLoading: 0,
   loadingAll: false
 })
 

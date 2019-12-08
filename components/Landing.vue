@@ -1,11 +1,13 @@
 <template>
-  <div class="panel-landing" id="section-1">
-    <h1 class="landing-heading">Hello, Blockstack!</h1>
+  <div id="section-1" class="panel-landing">
+    <h1 class="landing-heading">
+      Hello, Blockstack!
+    </h1>
     <p class="lead">
       <a
+        id="signin-button"
         href="#"
         class="btn btn-primary btn-lg"
-        id="signin-button"
         @click.prevent="signIn"
       >
         Sign In with Blockstack
@@ -17,7 +19,7 @@
 <script>
 // import { userSession } from '../userSession'
 export default {
-  name: 'signin',
+  name: 'Signin',
   computed: {
     userSession () {
       return this.$store.state.user.userSession

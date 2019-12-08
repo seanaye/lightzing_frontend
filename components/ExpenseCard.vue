@@ -16,14 +16,14 @@
               :input-value="data.selected"
             >
               <v-avatar left>
-                <v-img :src="data.item.avatarUrl"></v-img>
+                <v-img :src="data.item.avatarUrl" />
               </v-avatar>
               {{ data.item.name }}
             </v-chip>
           </template>
           <template v-slot:item="data">
             <v-list-item-avatar>
-              <v-img :src="data.item.avatarUrl"></v-img>
+              <v-img :src="data.item.avatarUrl" />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>{{ data.item.name }}</v-list-item-title>
@@ -53,14 +53,14 @@
               @click:close="remove(data.item.username)"
             >
               <v-avatar left>
-                <v-img :src="data.item.avatarUrl"></v-img>
+                <v-img :src="data.item.avatarUrl" />
               </v-avatar>
               {{ data.item.name }}
             </v-chip>
           </template>
           <template v-slot:item="data">
             <v-list-item-avatar>
-              <v-img :src="data.item.avatarUrl"></v-img>
+              <v-img :src="data.item.avatarUrl" />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>{{ data.item.name }}</v-list-item-title>
@@ -72,26 +72,26 @@
     <v-row align="center" justify="center" justify-md="space-around" dense>
       <v-col cols="10" sm="2">
         <v-radio-group v-model="currency">
-          <v-radio label="Satoshi" value="Satoshi" color="warning"></v-radio>
-          <v-radio label="USD" value="USD" color="warning"></v-radio>
+          <v-radio label="Satoshi" value="Satoshi" color="warning" />
+          <v-radio label="USD" value="USD" color="warning" />
         </v-radio-group>
       </v-col>
       <v-col cols="10" sm="8" md="3" lg="4">
         <v-text-field
-          type="number"
           v-model="payAmount"
+          type="number"
           :suffix="currency"
           label="Split Amount: "
           color="yellow"
-        ></v-text-field>
+        />
       </v-col>
       <v-col cols="10" sm="8" md="3" lg="4">
         <v-text-field
-          type="text"
           v-model="payDescription"
+          type="text"
           label="Description"
           color="yellow"
-        ></v-text-field>
+        />
       </v-col>
       <v-col cols="10" md="5" class="text-center">
         {{ convString }}
@@ -100,21 +100,21 @@
     <v-row justify="center">
       <v-col cols="10">
         <v-list :color="color">
-          <v-divider></v-divider>
+          <v-divider />
           <template v-for="(item, i) in splitWithObj">
-            <v-list-item  :key="item.username">
+            <v-list-item :key="item.username">
               <v-list-item-avatar>
-                <v-img :src="item.avatarUrl"></v-img>
+                <v-img :src="item.avatarUrl" />
               </v-list-item-avatar>
               <v-list-item-content>
                 {{ item.name }}
               </v-list-item-content>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-list-item-action-text>
                 Owes {{ selectedPaidByName }} {{ payAmount / splitWith.length }} {{ currency }}
               </v-list-item-action-text>
             </v-list-item>
-            <v-divider :key="item.username + i"></v-divider>
+            <v-divider :key="item.username + i" />
           </template>
         </v-list>
       </v-col>
@@ -122,7 +122,9 @@
     <v-row justify="end" dense>
       <v-col cols="auto">
         <v-card-actions>
-          <v-btn @click="cancel" class="mr-3">Cancel</v-btn>
+          <v-btn class="mr-3" @click="cancel">
+            Cancel
+          </v-btn>
           <v-tooltip top nudge-left="50" :disabled="!errorMsg">
             <template v-slot:activator="{ on }">
               <div v-on="on">
@@ -131,14 +133,16 @@
                   dark
                   :disabled="invalidPost"
                   @click="postPayment"
-                >Post!</v-btn>
+                >
+                  Post!
+                </v-btn>
               </div>
             </template>
             <span>{{ errorMsg }}</span>
           </v-tooltip>
         </v-card-actions>
       </v-col>
-      <v-col cols="1"></v-col>
+      <v-col cols="1" />
     </v-row>
   </v-container>
 </template>
@@ -245,6 +249,10 @@ export default {
       }
     }
   },
+  created () {
+    this.getExchangeRate()
+    this.$store.commit('M_SELECTED_PAID_BY', this.me.username)
+  },
   methods: {
     remove (id) {
       const newIDs = this.splitWith.filter(elem => elem !== id)
@@ -263,18 +271,15 @@ export default {
         this.$store.dispatch('payment/POST_PAYMENT',
           {
             amount: this.payAmount / this.splitWith.length,
-            id: payer.username,
+            from: payer.username,
             desc: this.payDescription,
-            to: this.selectedPaidBy.username
+            to: this.selectedPaidBy,
+            currency: this.currency,
+            poster: this.me.username
           }
         )
       }
     }
-  },
-  created () {
-    this.getExchangeRate()
-    this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: true })
-    this.$store.commit('M_SELECTED_PAID_BY', this.me.username)
   }
 }
 </script>

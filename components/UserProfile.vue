@@ -1,12 +1,18 @@
 <template>
   <v-container>
     <v-row justify="space-around" dense>
-      <v-col cols="12" sm="3" lg="2" class="text-center">
+      <v-col cols="12" sm="3" lg="2" class="text-center" @click="showQR = !showQR">
         <v-fade-transition mode="out-in">
-          <v-avatar v-if="imageLoaded" size="120" class="ma-md-4 pt-5">
+          <v-avatar v-if="imageLoaded && !showQR" size="120" class="ma-md-4 pt-5" >
             <img :src="avatarUrl">
           </v-avatar>
-          <v-skeleton-loader v-else type="image" class="ma-md-4 pt-5"></v-skeleton-loader>
+          <vue-qr
+            v-else-if="imageLoaded && showQR"
+            :size="120"
+            class="ma-md-4 pt-5"
+            :text="`lightzing.me/user/${id}`"
+          ></vue-qr>
+          <v-skeleton-loader v-else type="image" class="ma-md-4 pt-5" />
         </v-fade-transition>
       </v-col>
       <v-col cols="10" sm="8" md="8">
@@ -21,10 +27,10 @@
               </v-card-subtitle>
             </v-col>
             <v-col v-else cols="6">
-              <v-skeleton-loader type="text@2" width="100%"></v-skeleton-loader>
+              <v-skeleton-loader type="text@2" width="100%" />
             </v-col>
           </v-fade-transition>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-fade-transition mode="out-in">
             <v-col v-if="person" cols="auto" align-self="center">
               <v-btn
@@ -32,7 +38,9 @@
                 rounded
                 color="warning"
                 @click="$store.dispatch('user/LOGOUT')"
-              >Sign Out</v-btn>
+              >
+                Sign Out
+              </v-btn>
               <v-btn
                 v-else
                 rounded
@@ -43,32 +51,34 @@
               </v-btn>
             </v-col>
             <v-col v-else cols="auto">
-              <v-skeleton-loader type="button"></v-skeleton-loader>
+              <v-skeleton-loader type="button" />
             </v-col>
           </v-fade-transition>
           <v-col cols="12">
-            <v-divider></v-divider>
+            <v-divider />
           </v-col>
           <v-col cols="12">
             <v-fade-transition mode="out-in">
               <v-card-text v-if="person">
                 {{ description }}
               </v-card-text>
-              <v-skeleton-loader v-else type="paragraph"></v-skeleton-loader>
+              <v-skeleton-loader v-else type="paragraph" />
             </v-fade-transition>
           </v-col>
         </v-row>
       </v-col>
     </v-row>
-    <v-divider></v-divider>
-    <v-row justify="center" dense v-if="!isLocal">
-      <v-spacer></v-spacer>
+    <v-divider />
+    <v-row v-if="!isLocal" justify="center" dense>
+      <v-spacer />
       <v-col cols="auto">
         <v-card-actions>
           <v-tooltip bottom :disabled="isFriend">
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <v-btn @click="showExpense" :disabled="!isFriend">Add Expense</v-btn>
+                <v-btn :disabled="!isFriend" @click="showExpense">
+                  Add Expense
+                </v-btn>
               </div>
             </template>
             <span>Follow this user to split expenses</span>
@@ -80,14 +90,19 @@
 </template>
 
 <script>
+import VueQr from 'vue-qr'
 
 export default {
+  components: {
+    VueQr
+  },
   props: {
     id: String
   },
   data () {
     return {
-      imageLoaded: false
+      imageLoaded: false,
+      showQR: false
     }
   },
   computed: {
@@ -142,6 +157,17 @@ export default {
       }
     }
   },
+  watch: {
+    avatarUrl () {
+      this.loadImage()
+    },
+    userData () {
+      this.loadData()
+    }
+  },
+  created () {
+    this.loadData()
+  },
   methods: {
     addOrRemove () {
       if (this.isFriend) {
@@ -170,17 +196,6 @@ export default {
         this.loadImage()
       }
     }
-  },
-  watch: {
-    avatarUrl () {
-      this.loadImage()
-    },
-    userData () {
-      this.loadData()
-    }
-  },
-  created () {
-    this.loadData()
   }
 }
 </script>

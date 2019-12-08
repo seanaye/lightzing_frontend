@@ -1,7 +1,7 @@
 <template>
   <div>
-    <landing v-if="!userSession.isUserSignedIn()"></landing>
-    <dashboard v-if="person" :user="person"></dashboard>
+    <landing v-if="!userSession.isUserSignedIn()" />
+    <dashboard v-if="person" :user="person" />
   </div>
 </template>
 

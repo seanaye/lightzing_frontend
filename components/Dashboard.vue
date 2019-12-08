@@ -3,11 +3,13 @@
     <v-row justify="center">
       <v-col cols="12" sm="6" lg="5">
         <v-card color="purple" elevation="12">
-          <v-card-title align="center">Hello, {{ givenName }}</v-card-title>
+          <v-card-title align="center">
+            Hello, {{ givenName }}
+          </v-card-title>
           <v-card-text>
             <v-row justify="center">
               <v-col cols="12" md="8" lg="6">
-                <v-img :src="avatar" avatar></v-img>
+                <v-img :src="avatar" avatar />
               </v-col>
               <v-col cols="12">
                 {{ currentStatus }}
@@ -17,13 +19,17 @@
           <v-card-actions>
             <v-row justify="center">
               <v-col cols="12">
-                <v-text-field v-model="newStatus" outlined color="white" label="Enter a new status:"></v-text-field>
+                <v-text-field v-model="newStatus" outlined color="white" label="Enter a new status:" />
               </v-col>
               <v-col cols="12" md="6">
-                <v-btn @click="updateStatus" color="purple darken-4" rounded>Update Status</v-btn>
+                <v-btn color="purple darken-4" rounded @click="updateStatus">
+                  Update Status
+                </v-btn>
               </v-col>
               <v-col cols="12" md="6">
-                <v-btn @click="signOut" color="purple darken-4" rounded>Sign Out</v-btn>
+                <v-btn color="purple darken-4" rounded @click="signOut">
+                  Sign Out
+                </v-btn>
               </v-col>
             </v-row>
           </v-card-actions>
@@ -36,12 +42,14 @@
               <v-col cols="12">
                 <v-text-field v-model="searchUserQuery" color="white" outlined label="Search users">
                   <template v-slot:append>
-                    <v-icon @click="searchUser">mdi-magnify</v-icon>
+                    <v-icon @click="searchUser">
+                      mdi-magnify
+                    </v-icon>
                   </template>
                 </v-text-field>
               </v-col>
               <v-col cols="12">
-                <FriendList></FriendList>
+                <FriendList />
               </v-col>
             </v-row>
           </v-card-actions>
@@ -66,6 +74,17 @@ export default {
       newStatus: ''
     }
   },
+  computed: {
+    avatar () {
+      return this.$store.getters['user/userObj'].avatarUrl
+    },
+    givenName () {
+      return this.$store.getters['user/userObj'].name
+    },
+    currentStatus () {
+      return this.$store.state.user.currentStatus
+    }
+  },
   methods: {
     signOut () {
       this.$store.dispatch('user/LOGOUT')
@@ -80,19 +99,6 @@ export default {
       if (result) {
         this.$store.dispatch('friends/ADD_FRIENDS', { friends: [this.searchUserQuery], loadProfiles: true })
       }
-    }
-  },
-  created () {
-  },
-  computed: {
-    avatar () {
-      return this.$store.getters['user/userObj'].avatarUrl
-    },
-    givenName () {
-      return this.$store.getters['user/userObj'].name
-    },
-    currentStatus () {
-      return this.$store.state.user.currentStatus
     }
   }
 }
