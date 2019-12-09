@@ -67,7 +67,9 @@ export const mutations = {
   },
   IS_POSTING (state, { isPosting, postSuccessFail }) {
     state.isPosting = isPosting
-    state.postSuccessFail = postSuccessFail
+    if (typeof postSuccessFail !== 'undefined') {
+      state.postSuccessFail = postSuccessFail
+    }
   },
   IS_LOADING (state, bool) {
     if (bool) {
@@ -79,14 +81,10 @@ export const mutations = {
 }
 
 export const actions = {
-  async NEW_PAYMENT ({ commit, rootState, state, rootGetters }, { amount, from, desc, to, currency, poster }) {
-    if (state.isPosting) {
-      return
-    }
+  async NEW_PAYMENT ({ commit, rootState, dispatch }, { amount, from, desc, to, currency, poster }) {
     commit('IS_POSTING', { isPosting: true, postSuccessFail: 0 })
-    const pubkey = rootGetters['friends/loadedObj'].reduce((acc, elem) => {
-      return (elem.username === from) ? elem.pubkey : acc
-    }, '') 
+
+    // Create payment obj
     const newPost = {
       amount,
       desc,
@@ -97,6 +95,7 @@ export const actions = {
       poster,
       paid: false
     }
+    // retrieve existing posts
     const keyObj = await retrieveKey(
       rootState.user.userData.username,
       from,
@@ -109,42 +108,25 @@ export const actions = {
       keyObj,
       rootState.user.userSession
     )
-    const post = [...curPayment, newPost]
-    
+    // concat new post to existing and post
+    const paymentObj = [...curPayment, newPost]
+
+    commit('M_PAYMENT', {
+      poster: rootState.user.userData.username,
+      postee: from,
+      payment: paymentObj
+    })
+
+    await dispatch('POST_PAYMENT', { from, paymentObj, keyObj })
+    commit('IS_POSTING', { isPosting: false })
   },
-  async POST_PAYMENT ({ commit, rootState, state, rootGetters }, { amount, from, desc, to, currency, poster }) {
-    if (state.isPosting) {
-      return
-    }
+  async POST_PAYMENT ({ commit, rootState, rootGetters }, { from, paymentObj, keyObj }) {
     commit('IS_POSTING', { isPosting: true, postSuccessFail: 0 })
+
     // get public key of the other other
     const pubkey = rootGetters['friends/loadedObj'].reduce((acc, elem) => {
       return (elem.username === from) ? elem.pubkey : acc
     }, '')
-    const newPost = {
-      amount,
-      desc,
-      from,
-      to,
-      time: new Date().getTime(),
-      currency,
-      poster,
-      paid: false
-    }
-    const keyObj = await retrieveKey(
-      rootState.user.userData.username,
-      from,
-      true,
-      rootState.user.userSession
-    )
-    const curPayment = await retrievePost(
-      rootState.user.userData.username,
-      from,
-      keyObj,
-      rootState.user.userSession
-    )
-    const post = [...curPayment, newPost]
-    // Create post data
 
     // create key
     const keyData = keyObj || {
@@ -153,7 +135,7 @@ export const actions = {
     }
     // symmetrically encrypt and store the data publicly
     const cipher = crypto.createCipheriv('aes-256-cbc', keyData.key, keyData.iv)
-    const cipherText = cipher.update(JSON.stringify(post), 'utf-8', 'hex') + cipher.final('hex')
+    const cipherText = cipher.update(JSON.stringify(paymentObj), 'utf-8', 'hex') + cipher.final('hex')
     await rootState.user.userSession.putFile(`post/${from.replace(/\./g, '_')}.hex`, cipherText, { sign: true, encrypt: false })
       .catch((e) => {
         console.error(e)
@@ -165,6 +147,7 @@ export const actions = {
       iv: keyData.iv.toString('hex'),
       key: keyData.key.toString('hex')
     }
+    // encrypt symetric key with other users pubkey
     const keyDataCipherTextObject = encryptContent(JSON.stringify(stringifiedKey), { publicKey: pubkey })
     await rootState.user.userSession.putFile(
       `post/${from.replace(/\./g, '_')}_cipherkey.json`,
@@ -174,6 +157,7 @@ export const actions = {
       console.error(e)
       commit('IS_POSTING', { isPosting: false, postSuccessFail: -1 })
     })
+    // encrypt symmetric key for local user
     await rootState.user.userSession.putFile(
       `post/${from.replace(/\./g, '_')}_personalkey.json`,
       JSON.stringify(stringifiedKey),
@@ -182,7 +166,6 @@ export const actions = {
       console.error(e)
       commit('IS_POSTING', { isPosting: false, postSuccessFail: -1 })
     })
-    commit('M_PAYMENT', newPost)
     commit('IS_POSTING', { isPosting: false, postSuccessFail: 1 })
   },
   async LOAD_OTHER_PAYMENT ({ commit, rootState }, id) {
@@ -202,7 +185,7 @@ export const actions = {
       rootState.user.userSession
     )
     if (payment) {
-      commit('ADD_PAYMENT', { poster: id, postee: username, payment })
+      commit('M_PAYMENT', { poster: id, postee: username, payment })
     }
     commit('IS_LOADING', false)
   },
@@ -222,27 +205,37 @@ export const actions = {
       rootState.user.userSession
     )
     if (payment) {
-      commit('ADD_PAYMENT', { poster: username, postee: id, payment })
+      commit('M_PAYMENT', { poster: username, postee: id, payment })
     }
     commit('IS_LOADING', false)
   },
-  async REMOVE_PAYMENT ({ commit, rootState, state }, { poster, postee, index }) {
-    commit('IS_LOADING', true)
+  async REMOVE_PAYMENT ({ commit, rootState, state, dispatch }, { poster, postee, index }) {
+    console.log({ poster, postee, index })
     const key = `${poster}->${postee}`
     const newFile = state.payments[key].filter((elem, i) => {
       return i !== index
     })
-    commit('M_PAYMENT', { poster, postee, payment: newFile})
+    console.log({ newFile })
+    commit('M_PAYMENT', { poster, postee, payment: newFile })
 
+    const keyObj = await retrieveKey(
+      rootState.user.userData.username,
+      postee,
+      true,
+      rootState.user.userSession
+    )
+
+    await dispatch('POST_PAYMENT', { from: postee, paymentObj: newFile, keyObj })
   }
 }
 
 export const getters = {
   sortedPayments (state) {
     const arr = Object.values(state.payments)
+    console.log({ arr })
     const mapped = arr.map((lst) => {
       return lst.map((payment, i) => {
-        return { ...payment, index: i}
+        return { ...payment, index: i }
       })
     })
     return mapped.flat().sort((a, b) => {

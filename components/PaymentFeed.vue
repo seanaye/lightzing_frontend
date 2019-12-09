@@ -29,11 +29,15 @@
             <template v-for="(payment, i) in payments">
               <v-list-item
                 :key="i * 2 + 1"
-                @click="$router.push(`/user/${payment.poster}`)"
               >
-                <v-list-item-avatar>
-                  <v-img :src="payment.avatarUrl" />
-                </v-list-item-avatar>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-list-item-avatar @click="$router.push(`/user/${payment.poster}`)">
+                      <v-img :src="payment.avatarUrl" v-on="on"/>
+                    </v-list-item-avatar>
+                  </template>
+                  Go to profile
+                </v-tooltip>
                 <v-list-item-content>
                   <v-list-item-title>
                     {{fromToString(payment.from, payment.to)}}
@@ -48,13 +52,20 @@
                 <v-list-item-action>
                   <v-tooltip v-if="payment.poster === myUsername" bottom>
                     <template v-slot:activator="{ on }">
-                      <v-icon v-on="on">mdi-close</v-icon>
+                      <v-btn
+                        icon
+                        @click="remove(payment.poster, payment.from, payment.index)"
+                      >
+                        <v-icon v-on="on">mdi-close</v-icon>
+                      </v-btn>
                     </template>
                     Delete post
                   </v-tooltip>
                   <v-tooltip v-if="payment.from === myUsername" bottom>
                     <template v-slot:activator="{ on }">
-                      <v-icon v-on="on">mdi-flash</v-icon>
+                      <v-btn icon>
+                        <v-icon v-on="on">mdi-flash</v-icon>
+                      </v-btn>
                     </template>
                     Pay
                   </v-tooltip>
@@ -121,6 +132,10 @@ export default {
     fromToString (from, to) {
       return `${(from === this.myUsername) ? 'You owe ' : from + ' owes'}
         ${(to === this.myUsername) ? 'you' : to}`
+    },
+    async remove (poster, postee, index) {
+      console.log({ poster, postee, index })
+      await this.$store.dispatch('payment/REMOVE_PAYMENT', { poster, postee, index })
     }
   }
 }

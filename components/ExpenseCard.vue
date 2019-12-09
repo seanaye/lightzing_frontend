@@ -261,7 +261,7 @@ export default {
     },
     postPayment () {
       for (const payer of this.splitWithObj) {
-        this.$store.dispatch('payment/POST_PAYMENT',
+        this.$store.dispatch('payment/NEW_PAYMENT',
           {
             amount: this.payAmount / this.splitWith.length,
             from: payer.username,
