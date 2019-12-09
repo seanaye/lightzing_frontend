@@ -37,7 +37,7 @@ export const actions = {
       ...new Set(state.friends.concat(friends))
     ].filter(elem => elem !== rootState.user.userData.username)
     commit('M_FRIENDS', newFriends)
-    const updated = await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
+    await rootState.user.userSession.putFile('friends.json', JSON.stringify(newFriends))
       .catch(e => console.error(e))
     if (loadProfiles) {
       dispatch('LOAD_FRIENDS_PROFILES')

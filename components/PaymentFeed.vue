@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row justify="center">
       <v-slide-y-transition mode="out-in">
-        <v-row v-if="!noPayments" justify="center">
+        <v-row justify="center">
           <v-col cols="4" style="text-align: center;">
             You are owed<br>${{$store.getters['payment/totalReceivable']}}
           </v-col>
@@ -18,12 +18,12 @@
         </v-row>
       </v-slide-y-transition>
       <v-col cols="12">
-        <v-progress-linear indeterminate :active="isLoading">
+        <v-progress-linear indeterminate :active="isLoading" color="accent">
         </v-progress-linear>
         <div v-if="noPayments">
           You have not posted any payments yet. Follow other users and post payments to track expenses.
         </div>
-        <v-list v-if="!noPayments" three-line :color="color">
+        <v-list v-if="!noPayments" three-line :color="color" >
           <v-divider></v-divider>
           <v-slide-y-transition group mode="out-in">
             <template v-for="(payment, i) in payments">
@@ -36,7 +36,7 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>
-                    {{payment.from}} owes {{payment.to}}
+                    {{fromToString(payment.from, payment.to)}}
                     {{(payment.currency === 'USD') ? '$' : ''}}{{payment.amount}}
                     {{(payment.currency !== 'USD') ? payment.currency : ''}}
                   </v-list-item-title>
@@ -45,6 +45,20 @@
                     Posted by: {{payment.poster}} at {{ new Date(payment.time) }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
+                <v-list-item-action>
+                  <v-tooltip v-if="payment.poster === myUsername" bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-icon v-on="on">mdi-close</v-icon>
+                    </template>
+                    Delete post
+                  </v-tooltip>
+                  <v-tooltip v-if="payment.from === myUsername" bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-icon v-on="on">mdi-flash</v-icon>
+                    </template>
+                    Pay
+                  </v-tooltip>
+                </v-list-item-action>
               </v-list-item>
               <v-divider :key="i * 2" />
             </template>
@@ -93,11 +107,20 @@ export default {
     },
     isLoading () {
       return this.$store.state.payment.isLoading > 0 || this.$store.state.friends.isLoading > 0
+    },
+    myUsername () {
+      return this.$store.getters['user/userObj'].username
     }
   },
   watch: {
     isLoading () {
       this.loadingStarted = true
+    }
+  },
+  methods: {
+    fromToString (from, to) {
+      return `${(from === this.myUsername) ? 'You owe ' : from + ' owes'}
+        ${(to === this.myUsername) ? 'you' : to}`
     }
   }
 }

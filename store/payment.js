@@ -57,12 +57,11 @@ export const state = () => ({
   payments: {},
   isPosting: false,
   postSuccessFail: 0,
-  isLoading: 0,
-  allLoaded: false
+  isLoading: 0
 })
 
 export const mutations = {
-  ADD_PAYMENT (state, { poster, postee, payment }) {
+  M_PAYMENT (state, { poster, postee, payment }) {
     const key = `${poster}->${postee}`
     state.payments = { ...state.payments, [key]: payment }
   },
@@ -76,13 +75,43 @@ export const mutations = {
     } else {
       state.isLoading -= 1
     }
-  },
-  ALL_LOADED (state, bool) {
-    state.allLoaded = bool
   }
 }
 
 export const actions = {
+  async NEW_PAYMENT ({ commit, rootState, state, rootGetters }, { amount, from, desc, to, currency, poster }) {
+    if (state.isPosting) {
+      return
+    }
+    commit('IS_POSTING', { isPosting: true, postSuccessFail: 0 })
+    const pubkey = rootGetters['friends/loadedObj'].reduce((acc, elem) => {
+      return (elem.username === from) ? elem.pubkey : acc
+    }, '') 
+    const newPost = {
+      amount,
+      desc,
+      from,
+      to,
+      time: new Date().getTime(),
+      currency,
+      poster,
+      paid: false
+    }
+    const keyObj = await retrieveKey(
+      rootState.user.userData.username,
+      from,
+      true,
+      rootState.user.userSession
+    )
+    const curPayment = await retrievePost(
+      rootState.user.userData.username,
+      from,
+      keyObj,
+      rootState.user.userSession
+    )
+    const post = [...curPayment, newPost]
+    
+  },
   async POST_PAYMENT ({ commit, rootState, state, rootGetters }, { amount, from, desc, to, currency, poster }) {
     if (state.isPosting) {
       return
@@ -99,7 +128,8 @@ export const actions = {
       to,
       time: new Date().getTime(),
       currency,
-      poster
+      poster,
+      paid: false
     }
     const keyObj = await retrieveKey(
       rootState.user.userData.username,
@@ -152,7 +182,7 @@ export const actions = {
       console.error(e)
       commit('IS_POSTING', { isPosting: false, postSuccessFail: -1 })
     })
-    commit('ADD_PAYMENT', newPost)
+    commit('M_PAYMENT', newPost)
     commit('IS_POSTING', { isPosting: false, postSuccessFail: 1 })
   },
   async LOAD_OTHER_PAYMENT ({ commit, rootState }, id) {
@@ -195,13 +225,27 @@ export const actions = {
       commit('ADD_PAYMENT', { poster: username, postee: id, payment })
     }
     commit('IS_LOADING', false)
+  },
+  async REMOVE_PAYMENT ({ commit, rootState, state }, { poster, postee, index }) {
+    commit('IS_LOADING', true)
+    const key = `${poster}->${postee}`
+    const newFile = state.payments[key].filter((elem, i) => {
+      return i !== index
+    })
+    commit('M_PAYMENT', { poster, postee, payment: newFile})
+
   }
 }
 
 export const getters = {
   sortedPayments (state) {
     const arr = Object.values(state.payments)
-    return arr.flat().sort((a, b) => {
+    const mapped = arr.map((lst) => {
+      return lst.map((payment, i) => {
+        return { ...payment, index: i}
+      })
+    })
+    return mapped.flat().sort((a, b) => {
       if (a.time > b.time) {
         return -1
       } else {

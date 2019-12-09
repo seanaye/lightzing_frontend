@@ -2,7 +2,7 @@
   <div>
     <v-text-field
       v-model="searchUserQuery"
-      color="white"
+      color="accent"
       outlined
       label="Search users"
       @keydown.enter="searchUser"

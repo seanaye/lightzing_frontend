@@ -7,6 +7,22 @@
       app
     >
       <v-list>
+        <v-list-item>
+          <v-list-item-avatar>
+            <v-icon>mdi-theme-light-dark</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            Dark mode
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-switch
+              v-model="darkMode"
+              :color="(darkMode) ? 'blue' : ''"
+            >
+            </v-switch>
+          </v-list-item-action>
+        </v-list-item>
+        <v-divider></v-divider>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
@@ -14,9 +30,9 @@
           router
           exact
         >
-          <v-list-item-action>
+          <v-list-item-avatar>
             <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
+          </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
@@ -69,6 +85,16 @@ export default {
         }
       ],
       title: 'lightzing.me'
+    }
+  },
+  computed: {
+    darkMode: {
+      get () {
+        return this.$vuetify.theme.dark
+      },
+      set (value) {
+        this.$vuetify.theme.dark = value
+      }
     }
   }
 }

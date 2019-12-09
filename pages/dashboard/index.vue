@@ -2,23 +2,24 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" sm="10">
-        <v-card color="primary" elevation="12">
+        <v-card color="primary" elevation="6">
           <UserProfile :id="userId" />
         </v-card>
       </v-col>
       <v-col cols="12" sm="10">
-        <v-card color="info darken-2" class="px-3 py-3" elevation="12">
-          <FriendSearch color="info darken-2" />
+        <v-card color="secondary" class="px-3 py-3" elevation="6">
+          <FriendSearch color="secondary" />
           <v-progress-linear
             :active="$store.state.friends.isLoading > 0"
             indeterminate
+            color="accent"
           />
-          <FriendList color="info darken-2" />
+          <FriendList color="secondary" />
         </v-card>
       </v-col>
       <v-col cols="12" sm="10">
-        <v-card color="purple" elevation="12">
-          <PaymentFeed color="purple" />
+        <v-card color="success" elevation="6">
+          <PaymentFeed color="success" />
         </v-card>
       </v-col>
     </v-row>

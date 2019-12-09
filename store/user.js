@@ -44,7 +44,7 @@ export const actions = {
       status: newStatus,
       created: Date.now()
     }
-    const updated = await state.userSession.putFile('status.json', JSON.stringify(status), { encrypt: false })
+    await state.userSession.putFile('status.json', JSON.stringify(status), { encrypt: false })
     commit('M_CURRENT_STATUS', status.status)
   },
   async LOAD_STATUS ({ commit, state }) {
