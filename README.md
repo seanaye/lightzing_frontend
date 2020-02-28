@@ -1,6 +1,11 @@
-# publist
+# Lightzing Frontend
 
-> My wondrous Nuxt.js project
+### Hackathon prize winner 🎉
+
+[Lightzing.me](https://lightzing.me) came 3rd place in the [Blockstack cant be evil hackathon](https://community.blockstack.org/evil-3)
+
+> Lightzing.me is a work in progress app for splitting expenses between friends with bitcoin transactions using the lightning network and Blockstack authentication.
+
 
 ## Build Setup
 
