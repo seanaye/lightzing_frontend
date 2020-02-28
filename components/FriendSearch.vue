@@ -30,7 +30,7 @@
               {{ (isFriend) ? '- Unfollow' : '+ Follow' }}
             </v-btn> -->
             <v-btn icon>
-              <v-icon :color="(isFriend) ? 'red' : 'green'" @click="addOrRemove">
+              <v-icon @click="addOrRemove">
                 {{ (isFriend) ? 'mdi-minus' : 'mdi-plus' }}
               </v-icon>
             </v-btn>

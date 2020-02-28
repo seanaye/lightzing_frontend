@@ -37,6 +37,21 @@
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
         </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item
+          v-for="friend in friends"
+          :key="friend"
+          :to="`/user/${friend}`"
+          router
+          exact
+        >
+          <v-list-item-avatar>
+            <v-icon>mdi-account</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title v-text="friend" />
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar
@@ -45,7 +60,10 @@
       app
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="title" />
+      <v-toolbar-title>
+        {{title}}
+        <v-icon>mdi-flash</v-icon>
+      </v-toolbar-title>
     </v-app-bar>
     <v-content>
       <nuxt />
@@ -79,9 +97,9 @@ export default {
           to: '/dashboard'
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Seans Profile (temp)',
-          to: '/user/seanwaye.id.blockstack'
+          icon: 'mdi-plus',
+          title: 'New Payment',
+          to: '/newexpense'
         }
       ],
       title: 'lightzing.me'
@@ -95,6 +113,14 @@ export default {
       set (value) {
         this.$vuetify.theme.dark = value
       }
+    },
+    friends () {
+      return this.$store.state.friends.friends
+    }
+  },
+  created () {
+    if (this.$store.state.friends.friends.length === 0 && this.userData) {
+      this.$store.dispatch('friends/LOAD_FRIENDS', { loadProfiles: false })
     }
   }
 }

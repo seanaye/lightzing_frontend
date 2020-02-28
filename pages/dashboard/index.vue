@@ -7,6 +7,11 @@
         </v-card>
       </v-col>
       <v-col cols="12" sm="10">
+        <v-card color="success" elevation="6">
+          <PaymentFeed color="success" />
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="10">
         <v-card color="secondary" class="px-3 py-3" elevation="6">
           <FriendSearch color="secondary" />
           <v-progress-linear
@@ -15,11 +20,6 @@
             color="accent"
           />
           <FriendList color="secondary" />
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="10">
-        <v-card color="success" elevation="6">
-          <PaymentFeed color="success" />
         </v-card>
       </v-col>
     </v-row>

@@ -1,7 +1,7 @@
 {
-  "name": "publist",
+  "name": "lightzing.me",
   "version": "1.0.0",
-  "description": "My wondrous Nuxt.js project",
+  "description": "Share and split expenses with friends instantly over lightning network",
   "author": "Sean Aye",
   "private": true,
   "scripts": {

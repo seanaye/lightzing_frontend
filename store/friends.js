@@ -57,6 +57,11 @@ export const actions = {
     console.log('load frinds')
     const file = await rootState.user.userSession.getFile('friends.json')
       .catch(e => console.error(e))
+    if (!file) {
+      commit('M_ISLOADING', false)
+      commit('M_ERROR', 'Failed to load friends')
+      return
+    }
     const friends = JSON.parse(file)
     commit('M_FRIENDS', friends || [])
     if (loadProfiles) {
@@ -69,6 +74,11 @@ export const actions = {
       commit('M_ISLOADING', true)
       const userData = await lookupProfile(id)
         .catch(e => console.error(e))
+      if (!userData) {
+        commit('M_ISLOADING', false)
+        commit('M_ERROR', `Failed to load user ${id}`)
+        return
+      }
       const person = new Person(userData)
       person.username = id
       const pubKey = await rootState.user.userSession.getFile('publicKey.json', { username: id, verify: true, decrypt: false })
@@ -76,7 +86,9 @@ export const actions = {
       if (pubKey) {
         person.pubkey = JSON.parse(pubKey).appPublicKey
       } else {
-        console.error(`Could not retrive public key for ${id}`)
+        commit('M_ERROR', `Could not retrive public key for ${id}`)
+        commit('M_ISLOADING', false)
+        return
       }
       if (!state.loadedProfiles.map(elem => elem.username).includes(id)) {
         commit('M_LOADED_PROFILES', state.loadedProfiles.concat(person))
