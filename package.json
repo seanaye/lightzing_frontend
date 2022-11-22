@@ -16,7 +16,7 @@
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/pwa": "^3.0.0-0",
     "blockstack": "^19.3.0",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.15.8",
     "vue-qr": "^2.2.1"
   },
   "devDependencies": {
